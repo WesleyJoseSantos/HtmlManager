@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=1080, initial-scale=1.0">
+    <title>WiFi Manager</title>
+</head>
+<style>
+    .title{
+        text-align: center;
+    }
+    .field{
+        text-align: center;
+        padding: 10px;
+    }
+    .btn{
+        width: 100px;
+        height: 30px;
+        margin: 15px;
+    }
+    .center{
+        text-align: center;
+    }
+</style>
+<body>
+    <h1 class="title">WiFi Manager</h1>
+    <div class="field">
+        ssid:
+        <input id="ssid" type="text">
+    </div>
+    <div class="field">
+        pass:
+        <input id="pass" type="password" >
+    </div>
+    <div class="center">
+        <button class="btn" onclick="sendCredentials()">
+            Send
+        </button>
+    </div>
+</body>
+<script>
+    function sendCredentials(){
+        var credentials = {
+            ssid: document.getElementById("ssid").value,
+            pass: document.getElementById("pass").value
+        };
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                window.alert("Credentials sended to device. Connection test is in progress...");
+            }
+        }
+
+        var data = JSON.stringify(credentials)
+        xhttp.open("POST", "/?data="+data, true);
+        xhttp.send();
+    }
+</script>
+</html>
