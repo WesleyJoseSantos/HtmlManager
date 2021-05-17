@@ -38,8 +38,8 @@ public:
 
         if(request->method() == 1){
             if(request->hasParam("data")){
-                request->send(200, "text/json", data);
                 Serial.println(data);
+                request->send(200, "text/html", data);
             }else if(request->hasParam("screen")){
                 String screen = request->getParam("screen")->value();
                 request->send(SPIFFS, screen, "text/html");
