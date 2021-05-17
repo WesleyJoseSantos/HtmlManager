@@ -31,7 +31,7 @@ class SimpleWiFiManager
 {
 private:
     AsyncWebServer server;
-    HtmlManager htmlManager;
+    HtmlManager htmlWiFiManager;
     WiFiManagerData data;
     DNSServer dnsServer;
     bool provisioned;
@@ -62,17 +62,19 @@ public:
         if(!SPIFFS.begin()){
             Serial.println("SPIFFS Mount Failed!");
         }
-        htmlManager.setHomePage(HOME_PAGE);
+        htmlWiFiManager.setHomePage(HOME_PAGE);
         if(data.load()){
             Serial.println("Using previous credentials.");
             if(!connect()){
                 Serial.println("Credentials refused.");
                 ESP.reset();
             }
+            dnsServer.stop();
+            dnsServer.start(54, "devlocalcontrol.com", WiFi.localIP());
         }else{
             WiFi.softAP("WiFi Manager");
             dnsServer.start(53, "*", WiFi.softAPIP());
-            server.addHandler(&htmlManager.setFilter(ON_AP_FILTER));
+            server.addHandler(&htmlWiFiManager);
             server.begin();
             Serial.printf("Started server at %s\n", WiFi.softAPIP().toString().c_str());
         }
@@ -81,12 +83,15 @@ public:
     void task(){
         if(!provisioned){
             dnsServer.processNextRequest();
-            if(htmlManager.dataAvailable()){
-                String json = htmlManager.getData();
-                WiFiManagerData data = WiFiManagerData::fromJson(json);
+            if(htmlWiFiManager.dataAvailable()){
+                String json = htmlWiFiManager.getData();
+                data.fromJson(json);
+                htmlWiFiManager.setData("connecting");
                 if(connect()){
+                    htmlWiFiManager.setData(WiFi.localIP().toString());
                     data.save();
-                    ESP.restart();
+                }else{
+                    htmlWiFiManager.setData("Connection failed!");
                 }
             }
         }
