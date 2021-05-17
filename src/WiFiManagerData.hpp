@@ -20,8 +20,8 @@
 class WiFiManagerData
 {
 private:
-    const char *ssid;
-    const char *pass;
+    String ssid;
+    String pass;
 public:
     WiFiManagerData() {}
     ~WiFiManagerData() {}
@@ -35,13 +35,10 @@ public:
 
     bool load(){
         if(SPIFFS.exists(WIFI_FILE)){
-                File file = SPIFFS.open(WIFI_FILE, "r");
-                if(!file){
+            File file = SPIFFS.open(WIFI_FILE, "r");
+            if(!file){
                 String json = file.readString();
-
-                WiFiManagerData data = WiFiManagerData::fromJson(json);
-                this->ssid = data.ssid;
-                this->pass = data.pass;
+                this->fromJson(json);                
                 file.close();
                 return true;
             }
@@ -58,15 +55,12 @@ public:
 
     }
 
-    static WiFiManagerData fromJson(String serializedJson){
+    void fromJson(String serializedJson){
         StaticJsonDocument<256> jsonDoc;
-        WiFiManagerData data;
         deserializeJson(jsonDoc, serializedJson);
 
-        data.ssid = jsonDoc[TO_KEY(ssid)];
-        data.pass = jsonDoc[TO_KEY(pass)];
-
-        return data;
+        ssid = jsonDoc[TO_KEY(ssid)].as<String>();
+        pass = jsonDoc[TO_KEY(pass)].as<String>();
     }
 
     String toJson(){
