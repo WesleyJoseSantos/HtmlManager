@@ -33,23 +33,46 @@
         pass:
         <input id="pass" type="password" >
     </div>
-    <div class="center">
-        <button class="btn" onclick="sendCredentials()">
+    <div id="btnContainer" class="center">
+        <button id="btnSend" class="btn" onclick="sendCredentials()">
             Send
         </button>
     </div>
 </body>
 <script>
+    var btn = document.getElementById("btnSend");
+    var conteiner = document.getElementById("btnContainer");
+    var text = document.createTextNode("Connecting...");
+
     function sendCredentials(){
         var credentials = {
             ssid: document.getElementById("ssid").value,
             pass: document.getElementById("pass").value
         };
-
+       
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function(){
             if(this.readyState == 4 && this.status == 200){
-                window.alert("Credentials sended to device. Connection test is in progress...");
+                conteiner.removeChild(btn);
+                conteiner.appendChild(text)
+
+                setInterval(() => {
+                    var nhttp = new XMLHttpRequest();
+                    nhttp.onreadystatechange = function () {
+                        if(nhttp.readyState == 4 && nhttp.status == 200){
+                            var data = nhttp.responseText;
+                            if(data != "connecting"){
+                                if(data = "Connection failed!"){
+                                        setTimeout(() => {
+                                            window.location.href = "192.168.4.1/";
+                                        }, 2500);
+                                    }
+                                }
+                        }
+                    }
+                    nhttp.open("GET", "/?data=true", true);
+                    nhttp.send();
+                }, 1000);
             }
         }
 
