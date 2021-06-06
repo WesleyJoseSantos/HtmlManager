@@ -25,7 +25,10 @@ private:
     String homepage;
     bool dataReceived;
 public:
-    HtmlManager() {}
+    HtmlManager() {
+        homepage = "/home.htm";
+    }
+    
     virtual ~HtmlManager() {}
 
     bool canHandle(AsyncWebServerRequest *request){
@@ -34,19 +37,19 @@ public:
 
     void handleRequest(AsyncWebServerRequest *request){
         Serial.print("Request Received ");
-        Serial.println(request->method());
+        Serial.println(request->methodToString());
+        Serial.println(request->url());
 
         if(request->method() == 1){
             if(request->hasParam("data")){
                 Serial.println(data);
                 request->send(200, "text/html", data);
-            }else if(request->hasParam("screen")){
-                String screen = request->getParam("screen")->value();
-                request->send(SPIFFS, screen, "text/html");
-                Serial.println(screen);
             }else{
-                request->send(SPIFFS, homepage, "text/html");
-                Serial.println(homepage);
+                if(request->url() == "/"){
+                    request->send(SPIFFS, homepage, "text/html");
+                }else{
+                    request->send(SPIFFS, request->url(), "text/html");
+                }
             }
         }
         
