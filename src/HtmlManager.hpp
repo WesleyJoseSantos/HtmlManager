@@ -24,6 +24,23 @@ private:
     String data;
     String homepage;
     bool dataReceived;
+
+    String getContentType(String url){
+        if(url.endsWith("jso")){
+            return "application/json";
+        }else if(url.endsWith("css")){
+            return "text/css";
+        }else if(url.endsWith("png")){
+            return "image/png";
+        }else if(url.endsWith("ico")){
+            return "image/x-icon";
+        }else if(url.endsWith("js")){
+            return "application/javascript";
+        }else{
+            return "text/html";
+        }
+    }
+
 public:
     HtmlManager() {
         homepage = "/home.htm";
@@ -42,13 +59,14 @@ public:
 
         if(request->method() == 1){
             if(request->hasParam("data")){
-                Serial.println(data);
-                request->send(200, "text/html", data);
+                String type = getContentType(request->url());
+                request->send(200, type, data);
             }else{
                 if(request->url() == "/"){
                     request->send(SPIFFS, homepage, "text/html");
                 }else{
-                    request->send(SPIFFS, request->url(), "text/html");
+                    String type = getContentType(request->url());
+                    request->send(SPIFFS, request->url(), type);
                 }
             }
         }
