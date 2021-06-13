@@ -21,7 +21,8 @@
 class HtmlManager : public AsyncWebHandler
 {
 private:
-    String data;
+    String dataToReceive;
+    String dataToSend;
     String homepage;
     bool dataReceived;
 
@@ -53,14 +54,14 @@ public:
     }
 
     void handleRequest(AsyncWebServerRequest *request){
-        Serial.print("Request Received ");
-        Serial.println(request->methodToString());
-        Serial.println(request->url());
+        //Serial.print("Request Received ");
+        //Serial.println(request->methodToString());
+        //Serial.println(request->url());
 
         if(request->method() == 1){
             if(request->hasParam("data")){
                 String type = getContentType(request->url());
-                request->send(200, type, data);
+                request->send(200, type, dataToSend);
             }else{
                 if(request->url() == "/"){
                     request->send(SPIFFS, homepage, "text/html");
@@ -73,9 +74,9 @@ public:
         
         if(request->method() == 2){
             if(request->hasParam("data")){
-                data = request->getParam("data")->value();
+                dataToReceive = request->getParam("data")->value();
                 dataReceived = true;
-                Serial.println(data);
+                //Serial.println(data);
                 request->send(200, "text/html", "OK");
             }
         }
@@ -87,7 +88,7 @@ public:
 
     String getData(){
         dataReceived = false;
-        return data;
+        return dataToReceive;
     }
 
     bool dataAvailable(){
@@ -95,6 +96,6 @@ public:
     }
 
     void setData(String data){
-        this->data = data;
+        this->dataToSend = data;
     }
 };
