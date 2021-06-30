@@ -22,7 +22,7 @@
 #include <ESPAsyncTCP.h>
 #endif
 #include "ESPAsyncWebServer.h"
-#include "HtmlManager.hpp"
+#include "WebServer.hpp"
 #include "WiFiManagerData.hpp"
 
 #define HOME_PAGE "/home.htm"
@@ -31,7 +31,7 @@ class SimpleWiFiManager
 {
 private:
     AsyncWebServer server;
-    HtmlManager htmlWiFiManager;
+    WebServer webServerWiFiManager;
     WiFiManagerData data;
     DNSServer dnsServer;
     bool provisioned;
@@ -62,7 +62,7 @@ public:
         if(!SPIFFS.begin()){
             Serial.println("SPIFFS Mount Failed!");
         }
-        htmlWiFiManager.setHomePage(HOME_PAGE);
+        webServerWiFiManager.setHomePage(HOME_PAGE);
         if(data.load()){
             Serial.println("Using previous credentials.");
             if(!connect()){
@@ -74,7 +74,7 @@ public:
         }else{
             WiFi.softAP("WiFi Manager");
             dnsServer.start(53, "*", WiFi.softAPIP());
-            server.addHandler(&htmlWiFiManager);
+            server.addHandler(&webServerWiFiManager);
             server.begin();
             Serial.printf("Started server at %s\n", WiFi.softAPIP().toString().c_str());
         }
@@ -83,15 +83,15 @@ public:
     void task(){
         if(!provisioned){
             dnsServer.processNextRequest();
-            if(htmlWiFiManager.dataAvailable()){
-                String json = htmlWiFiManager.getData();
+            if(webServerWiFiManager.dataAvailable()){
+                String json = webServerWiFiManager.getData();
                 data.fromJson(json);
-                htmlWiFiManager.setData("connecting");
+                webServerWiFiManager.setData("connecting");
                 if(connect()){
-                    htmlWiFiManager.setData(WiFi.localIP().toString());
+                    webServerWiFiManager.setData(WiFi.localIP().toString());
                     data.save();
                 }else{
-                    htmlWiFiManager.setData("Connection failed!");
+                    webServerWiFiManager.setData("Connection failed!");
                 }
             }
         }

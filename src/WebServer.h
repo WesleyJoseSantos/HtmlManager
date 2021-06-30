@@ -1,5 +1,5 @@
 /**
- * @file HtmlManager.h
+ * @file WebServer.h
  * @author your name (you@domain.com)
  * @brief 
  * @version 0.1
@@ -9,9 +9,9 @@
  * 
  */
 
-#ifndef __HTMLMANAGER__H__
-#define __HTMLMANAGER__H__
+#ifndef __WEBSERVER__H__
+#define __WEBSERVER__H__
 
-#include "HtmlManager.hpp"
+#include "WebServer.hpp"
 
-#endif  //!__HTMLMANAGER__H__
+#endif  //!__WEBSERVER__H__

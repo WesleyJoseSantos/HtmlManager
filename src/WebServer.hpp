@@ -1,5 +1,5 @@
 /**
- * @file HtmlManager.hpp
+ * @file WebServer.hpp
  * @author your name (you@domain.com)
  * @brief 
  * @version 0.1
@@ -18,7 +18,7 @@
 #include "SPIFFS.h"
 #endif  //ESP32
 
-class HtmlManager : public AsyncWebHandler
+class WebServer : public AsyncWebHandler
 {
 private:
     String dataToReceive;
@@ -43,11 +43,11 @@ private:
     }
 
 public:
-    HtmlManager() {
+    WebServer() {
         homepage = "/home.htm";
     }
     
-    virtual ~HtmlManager() {}
+    virtual ~WebServer() {}
 
     bool canHandle(AsyncWebServerRequest *request){
         return true;
