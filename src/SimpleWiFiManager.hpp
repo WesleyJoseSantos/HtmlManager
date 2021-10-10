@@ -16,7 +16,7 @@
 #ifdef ESP32
 #include <WiFi.h>
 #include <AsyncTCP.h>
-#include "SPIFFS.h"
+#include "LittleFS.h"
 #elif defined(ESP8266)
 #include <ESP8266WiFi.h>
 #include <ESPAsyncTCP.h>
@@ -59,8 +59,8 @@ public:
 
     void begin(){
         Serial.begin(74400);
-        if(!SPIFFS.begin()){
-            Serial.println("SPIFFS Mount Failed!");
+        if(!LittleFS.begin()){
+            Serial.println("LittleFS Mount Failed!");
         }
         webServerWiFiManager.setHomePage(HOME_PAGE);
         if(data.load()){

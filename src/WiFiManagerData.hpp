@@ -28,14 +28,14 @@ public:
 
     void save(){
         String json = this->toJson();
-        File file = SPIFFS.open(WIFI_FILE, "w+");
+        File file = LittleFS.open(WIFI_FILE, "w+");
         file.print(json);
         file.close();
     }
 
     bool load(){
-        if(SPIFFS.exists(WIFI_FILE)){
-            File file = SPIFFS.open(WIFI_FILE, "r");
+        if(LittleFS.exists(WIFI_FILE)){
+            File file = LittleFS.open(WIFI_FILE, "r");
             if(!file){
                 String json = file.readString();
                 this->fromJson(json);                
@@ -47,11 +47,11 @@ public:
     }
 
     void reset(){
-        SPIFFS.rename(WIFI_FILE, WIFI_FILE_BKP);
+        LittleFS.rename(WIFI_FILE, WIFI_FILE_BKP);
     }
 
     void restore(){
-        SPIFFS.rename(WIFI_FILE_BKP, WIFI_FILE);
+        LittleFS.rename(WIFI_FILE_BKP, WIFI_FILE);
 
     }
 

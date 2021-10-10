@@ -12,10 +12,10 @@
 #pragma once
 
 #include "ESPAsyncWebServer.h"
-#include "FS.h"
+#include "LittleFS.h"
 
 #ifdef  ESP32
-#include "SPIFFS.h"
+#include "LittleFS.h"
 #endif  //ESP32
 
 class WebServer : public AsyncWebHandler
@@ -27,7 +27,7 @@ private:
     bool dataReceived;
 
     String getContentType(String url){
-        if(url.endsWith("jso")){
+        if(url.endsWith("json")){
             return "application/json";
         }else if(url.endsWith("css")){
             return "text/css";
@@ -44,7 +44,7 @@ private:
 
 public:
     WebServer() {
-        homepage = "/home.htm";
+        homepage = "/home.html";
     }
     
     virtual ~WebServer() {}
@@ -54,20 +54,24 @@ public:
     }
 
     void handleRequest(AsyncWebServerRequest *request){
-        //Serial.print("Request Received ");
-        //Serial.println(request->methodToString());
-        //Serial.println(request->url());
-
         if(request->method() == 1){
             if(request->hasParam("data")){
                 String type = getContentType(request->url());
                 request->send(200, type, dataToSend);
             }else{
                 if(request->url() == "/"){
-                    request->send(SPIFFS, homepage, "text/html");
+                    if(LittleFS.exists(homepage)){
+                        request->send(LittleFS, homepage, "text/html");
+                    }else{
+                        request->send(404, "text/html", "file not exists");
+                    }
                 }else{
-                    String type = getContentType(request->url());
-                    request->send(SPIFFS, request->url(), type);
+                    if(LittleFS.exists(request->url())){
+                        String type = getContentType(request->url());
+                        request->send(LittleFS, request->url(), type);
+                    }else{
+                        request->send(404, "text/html", "file not exists");
+                    }
                 }
             }
         }
@@ -76,7 +80,6 @@ public:
             if(request->hasParam("data")){
                 dataToReceive = request->getParam("data")->value();
                 dataReceived = true;
-                //Serial.println(data);
                 request->send(200, "text/html", "OK");
             }
         }
