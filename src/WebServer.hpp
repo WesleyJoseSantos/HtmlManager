@@ -20,11 +20,12 @@
 
 class WebServer : public AsyncWebHandler
 {
-private:
+protected:
     String dataToReceive;
     String dataToSend;
     String homepage;
     bool dataReceived;
+    bool dataSended;
 
     String getContentType(String url){
         if(url.endsWith("json")){
@@ -58,6 +59,7 @@ public:
             if(request->hasParam("data")){
                 String type = getContentType(request->url());
                 request->send(200, type, dataToSend);
+                dataSended = true;
             }else{
                 if(request->url() == "/"){
                     if(LittleFS.exists(homepage)){
